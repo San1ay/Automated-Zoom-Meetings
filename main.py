@@ -1,20 +1,24 @@
 # Libraries imported
 import pyautogui 
 import datetime
-import os
+import subprocess
 import time
 
 #Edit this file as Required
 def zoomClass(meetingID,meetingPassword,meetingTime):
 
+    #Getting Current Cursor Position
+    a,b=pyautogui.position()
+    
     # Edit Here
     # enter your path to Zoom.exe
     pathToZoom=r'C:\Users\Sanjay\AppData\Roaming\Zoom\bin\Zoom.exe'
-    os.system(pathToZoom)
+    subprocess.Popen(pathToZoom)
 
     # Adjust sleep time if your PC is slow
     time.sleep(5)
 
+    #Getting Joining Button Position
     x,y = pyautogui.locateCenterOnScreen('./joinButton.png')
     pyautogui.click(x,y)
 
@@ -31,7 +35,11 @@ def zoomClass(meetingID,meetingPassword,meetingTime):
     time.sleep(meetingTime*60) 
 
     # closing Zoom
-    os.system("TASKKILL /F /IM Zoom.exe")
+    subprocess.Popen("TASKKILL /F /IM Zoom.exe")
+    time.sleep(5) 
+
+    #Putting Cursor Back to Previous Position
+    pyautogui.moveTo(a,b)
     return
 
 
@@ -79,6 +87,11 @@ def joinMe():
     if(subIndex==7):
         return 
     currentSubject=todayTimeTable[subIndex]
+        
+    #Print Day and Subject
+    now=datetime.datetime.now()
+    print("\n"+now.strftime("%A %H:%M - ") + currentSubject)
+
     [meetingID,meetingPassword]= getID(currentSubject)
 
     # Edit Here
