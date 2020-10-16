@@ -1,6 +1,6 @@
 # Libraries imported
 import pyautogui 
-import datetime
+from datetime import datetime
 import subprocess
 import time
 
@@ -29,10 +29,10 @@ def zoomClass(meetingID,meetingPassword,meetingTime):
     pyautogui.write(meetingPassword)
     pyautogui.press('enter',interval = 5)
 
-    print("Meeting started for %s minutes"%meetingTime)
+    print("Meeting started for %s minutes"%int(meetingTime/60))
 
     #Total time of zoom session
-    time.sleep(meetingTime*60) 
+    time.sleep(meetingTime) 
 
     # closing Zoom
     subprocess.Popen("TASKKILL /F /IM Zoom.exe")
@@ -42,7 +42,43 @@ def zoomClass(meetingID,meetingPassword,meetingTime):
     pyautogui.moveTo(a,b)
     return
 
+def period_timing():
+    #Checking Current subject and remaining time
+    FMT = '%H:%M'
+    now=datetime.now().strftime(FMT)
+    current_time=datetime.strptime(now,FMT)
 
+    # Edit Here
+    # Set Your Timing According to Time Table in HH:MM format(24 Hr)
+    P1=["10:00","10:50"]
+    P2=["11:00","11:50"]
+    P3=["12:00","12:50"]
+    P4=["14:00","14:50"]
+    P5=["15:00","15:50"]
+
+
+    if(current_time> datetime.strptime(P1[0], FMT) and current_time < datetime.strptime(P1[1], FMT)):
+        remaining_time=(datetime.strptime(P1[1], FMT)-current_time).total_seconds()
+        return 1,remaining_time
+
+    elif(current_time> datetime.strptime(P2[0], FMT) and current_time < datetime.strptime(P2[1], FMT)):
+        remaining_time=(datetime.strptime(P2[1], FMT)-current_time).total_seconds()
+        return 2,remaining_time
+
+    elif(current_time> datetime.strptime(P3[0], FMT) and current_time < datetime.strptime(P3[1], FMT)):
+        remaining_time=(datetime.strptime(P3[1], FMT)-current_time).total_seconds()
+        return 3,remaining_time
+
+    elif(current_time> datetime.strptime(P4[0], FMT) and current_time < datetime.strptime(P4[1], FMT)):
+        remaining_time=(datetime.strptime(P4[1], FMT)-current_time).total_seconds()
+        return 4,remaining_time
+
+    elif(current_time> datetime.strptime(P5[0], FMT) and current_time < datetime.strptime(P5[1], FMT)):
+        remaining_time=(datetime.strptime(P5[1], FMT)-current_time).total_seconds()
+        return 5,remaining_time
+    
+    else: 
+        return 7,0
 
 def getID(sub):
     # Edit Here 
@@ -69,34 +105,29 @@ def getTimeTable(day):
     return Days[day]   
 
 def getDayOfWeek():
-    now = datetime.datetime.now()
+    now = datetime.now()
     return now.weekday()
 
 def getCurrentTime():
-    now=datetime.datetime.now()
+    now=datetime.now()
     return now.strftime("%H:%M")
     
 def joinMe():
     today=getDayOfWeek()
     todayTimeTable=getTimeTable(today)
-    # Edit Here
-    # Set Your Timing According to Time Table in HH:MM format(24 Hr)
-    timing={"10:02":0,"11:02":1,"12:02":2,"14:02":3,"15:02":4}
 
-    subIndex=timing.get(getCurrentTime(),7)
+    [subIndex,meetingTime]=period_timing()
     if(subIndex==7):
+        print("No Classes for Now")
         return 
     currentSubject=todayTimeTable[subIndex]
         
     #Print Day and Subject
-    now=datetime.datetime.now()
+    now=datetime.now()
     print("\n"+now.strftime("%A %H:%M - ") + currentSubject)
 
     [meetingID,meetingPassword]= getID(currentSubject)
 
-    # Edit Here
-    # default is 45 Min change total meeting time Accordinly
-    meetingTime=45
     zoomClass(meetingID,meetingPassword,meetingTime)
     return 
 
